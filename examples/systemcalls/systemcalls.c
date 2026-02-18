@@ -16,8 +16,14 @@ bool do_system(const char *cmd)
  *   and return a boolean true if the system() call completed with success
  *   or false() if it returned a failure
 */
-
+  if (0 > system(cmd))
+  {
+    return false;
+  }
+  else
+  {
     return true;
+  }
 }
 
 /**
@@ -39,7 +45,9 @@ bool do_exec(int count, ...)
     va_list args;
     va_start(args, count);
     char * command[count+1];
+    int child_status;
     int i;
+    pid_t fork_return_pid;
     for(i=0; i<count; i++)
     {
         command[i] = va_arg(args, char *);
@@ -58,10 +66,37 @@ bool do_exec(int count, ...)
  *   as second argument to the execv() command.
  *
 */
-
-    va_end(args);
-
-    return true;
+  
+  fork_return_pid = fork();
+  wait(&child_status);
+  
+  if (fork_return_pid == 0)
+  {
+    execv(command[0], command);
+    va_end(args); 
+    _exit(EXIT_FAILURE);
+  }
+  else
+  {
+    if (WIFEXITED (child_status))
+    {
+      if (WEXITSTATUS (child_status))
+      {
+        va_end(args);
+        return false;
+      }
+      else
+      {
+        va_end(args);
+        return true;
+      }
+    }
+    else
+    {
+      va_end(args);
+      return false;
+    }
+  }
 }
 
 /**
@@ -75,6 +110,9 @@ bool do_exec_redirect(const char *outputfile, int count, ...)
     va_start(args, count);
     char * command[count+1];
     int i;
+    int outputfile_d;
+    int child_status;
+    pid_t fork_return_pid;
     for(i=0; i<count; i++)
     {
         command[i] = va_arg(args, char *);
@@ -93,7 +131,39 @@ bool do_exec_redirect(const char *outputfile, int count, ...)
  *
 */
 
-    va_end(args);
+  outputfile_d = open(outputfile, O_WRONLY | O_TRUNC, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH );
+  fork_return_pid = fork();
+  wait(&child_status);
+ 
+  
+  if (fork_return_pid == 0)
+  {
+    if (dup2(outputfile_d, 1) < 0) { perror("dup2"); abort(); }
+    close(outputfile_d);
+    execv(command[0], command);
+    va_end(args); 
+    _exit(EXIT_FAILURE);
+  }
+  else
+  {
+    if (WIFEXITED (child_status))
+    {
+      if (WEXITSTATUS (child_status))
+      {
+        va_end(args);
+        return false;
+      }
+      else
+      {
+        va_end(args);
+        return true;
+      }
+    }
+    else
+    {
+      va_end(args);
+      return false;
+    }
+  }
 
-    return true;
 }
