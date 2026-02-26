@@ -94,6 +94,7 @@ echo "SHARED: ${SHARED} "
 
 for lib in "${SHARED[@]}"; do
   find / -type f -name *$lib*
+  find / -type f -name *aarch64*
 done
 
 # TODO: Add library dependencies to rootfs
