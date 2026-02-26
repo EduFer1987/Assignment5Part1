@@ -106,7 +106,7 @@ for lib in "${SHARED[@]}"; do
     echo "Copying $src -> ${OUTDIR}/rootfs/lib"
     sudo cp -a "$src" "${OUTDIR}/rootfs/lib"
   else
-    echo "ERROR: cannot find $lib under ${OUTDIR}/rootfs/lib" >&2
+    echo "ERROR: cannot find $lib under ${OUTDIR}/rootfs/lib src:$src" >&2
   fi
 done
 
