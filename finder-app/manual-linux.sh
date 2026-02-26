@@ -11,8 +11,8 @@ KERNEL_VERSION=v5.15.163
 BUSYBOX_VERSION=1_33_1
 FINDER_APP_DIR=$(realpath $(dirname $0))
 ARCH=arm64
-CROSS_COMPILE=aarch64-none-linux-gnu-
-COMPILER_DIR=/usr/aarch64-none-linux-gnu-
+CROSS_COMPILE=aarch64-linux-gnu-
+COMPILER_DIR=/usr/aarch64-linux-gnu
 
 if [ $# -lt 1 ]
 then
@@ -39,7 +39,7 @@ if [ ! -e ${OUTDIR}/linux-stable/arch/${ARCH}/boot/Image ]; then
 
     # TODO: Add your kernel build steps here
     ARCH=arm64
-    CROSS_COMPILE=aarch64-none-linux-gnu-
+    CROSS_COMPILE=aarch64-linux-gnu-
     make ARCH=${ARCH} CROSS_COMPILE=${CROSS_COMPILE} mrproper
     make ARCH=${ARCH} CROSS_COMPILE=${CROSS_COMPILE} defconfig
     make -j $(nproc) ARCH=${ARCH} CROSS_COMPILE=${CROSS_COMPILE} all
@@ -83,8 +83,8 @@ else
 fi
 
 # TODO: Make and install busybox
-  make ARCH=arm64 CROSS_COMPILE=aarch64-none-linux-gnu-  -j$(nproc)
-  make ARCH=arm64 CROSS_COMPILE=aarch64-none-linux-gnu-  CONFIG_PREFIX=${OUTDIR}/rootfs install
+  make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu-  -j$(nproc)
+  make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu-  CONFIG_PREFIX=${OUTDIR}/rootfs install
 echo "Library dependencies"
 
 interp="$(${CROSS_COMPILE}readelf -a busybox | grep 'program interpreter' |  sed -n 's/.*: \(.*\)]/\1/p' )"
@@ -93,11 +93,14 @@ SHARED=($(${CROSS_COMPILE}readelf -d busybox | awk -F'[][]' '/NEEDED/ {print $2}
 # TODO: Add library dependencies to rootfs
 if [ -f ${COMPILER_DIR}${interp} ]
 then
+  echo "Copying ${interp} in  ${OUTDIR}/rootfs/lib"
   sudo cp ${COMPILER_DIR}${interp}  ${OUTDIR}/rootfs/lib
+else
+  echo "Error file ${COMPILER_DIR}${interp}not found"
 fi
 
 for lib in "${SHARED[@]}"; do
-  src=$(find "${COMPILER_DIR}" -type f -name "$lib" 2>/dev/null | head -n1)
+  src=$(find "${COMPILER_DIR}" -type f -name *$lib* 2>/dev/null | head -n1)
   echo $src
   if [ -n "$src" ]; then
     echo "Copying $src -> ${OUTDIR}/rootfs/lib"
