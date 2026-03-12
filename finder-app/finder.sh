@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 # Acepta los siguientes argumentos de tiempo de ejecución: el primer argumento es una ruta a un
 # directorio en el sistema de archivos, referido abajo como filesdir; el segundo argumento es una
