@@ -13,7 +13,7 @@ default: $(TARGET)
 all: $(TARGET)
 
 $(TARGET): server.c
-	$(CROSS_COMPILE) $(CFLAGS) -o $(TARGET) server.c
+	$(CC) $(CFLAGS) -o $(TARGET) server.c
 
 clean:
 	rm -f $(TARGET) *.o
