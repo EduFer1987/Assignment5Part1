@@ -1,21 +1,20 @@
-# Définition du compilateur (par défaut gcc, ou celui de la cross-compilation)
-CROSS_COMPILE ?= 
+# ON NE DÉFINIT PAS DE VALEUR PAR DÉFAUT POUR CROSS_COMPILE ICI
+# ON LAISSE L'ENVIRONNEMENT (BUILDROOT) LA FOURNIR
 CC ?= $(CROSS_COMPILE)gcc
 CFLAGS ?= -g -Wall -Werror
+LDFLAGS ?= 
 
-# Nom de l'exécutable
 TARGET = aesdsocket
 
-# La première cible est la cible par "défaut"
-default: $(TARGET)
+# AJOUT DE .PHONY POUR ÉVITER LES CONFLITS AVEC DES FICHIERS DU MÊME NOM
+.PHONY: all clean default
 
-# La cible "all" fait la même chose ici
+default: all
+
 all: $(TARGET)
 
 $(TARGET): server.c
-	$(CC) $(CFLAGS) -o $(TARGET) server.c
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $(TARGET) server.c
 
 clean:
 	rm -f $(TARGET) *.o
-
-
