@@ -1,5 +1,5 @@
 # Définition du compilateur (par défaut gcc, ou celui de la cross-compilation)
-CROSS_COMPILE ?= aarch64-linux-gnu-
+CROSS_COMPILE ?= aarch64-none-linux-gnu-
 CC ?= $(CROSS_COMPILE)gcc
 CFLAGS ?= -g -Wall -Werror
 
