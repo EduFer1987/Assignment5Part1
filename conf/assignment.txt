@@ -1,5 +1,1 @@
-<<<<<<< HEAD
-assignment5-buildroot
-=======
-assignment5
->>>>>>> origin/main
+assignment4-buildroot
